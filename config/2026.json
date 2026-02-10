@@ -1,0 +1,47 @@
+{
+  "app": { "name": "FRC Scout 2026", "eventCode": "IST2026" },
+  "pages": [
+    {
+      "id": "prematch",
+      "title": "Pre-Match",
+      "fields": [
+        { "key": "scouter", "label": "Scouter", "type": "text", "required": true },
+        { "key": "match", "label": "Match #", "type": "number", "required": true },
+        { "key": "robotPos", "label": "Robot", "type": "radio", "options": ["R1","R2","R3","B1","B2","B3"], "required": true },
+        { "key": "team", "label": "Team #", "type": "number", "required": true }
+      ]
+    },
+    {
+      "id": "auto",
+      "title": "Autonomous",
+      "fields": [
+        { "key": "auto.speaker", "label": "Auto Speaker", "type": "counter", "min": 0 },
+        { "key": "auto.amp", "label": "Auto Amp", "type": "counter", "min": 0 }
+      ]
+    },
+    {
+      "id": "teleop",
+      "title": "Teleop",
+      "fields": [
+        { "key": "teleop.speaker", "label": "Teleop Speaker", "type": "counter", "min": 0 },
+        { "key": "teleop.amp", "label": "Teleop Amp", "type": "counter", "min": 0 }
+      ]
+    },
+    {
+      "id": "endgame",
+      "title": "Endgame",
+      "fields": [
+        { "key": "endgame.level", "label": "Endgame Level", "type": "radio", "options": ["None","Park","Level1","Level2","Level3"] },
+        { "key": "fouls", "label": "Fouls", "type": "counter", "min": 0 }
+      ]
+    },
+    {
+      "id": "post",
+      "title": "Post-Match",
+      "fields": [
+        { "key": "breakdown", "label": "Breakdown oldu mu?", "type": "checkbox" },
+        { "key": "notes", "label": "Notes", "type": "textarea" }
+      ]
+    }
+  ]
+}

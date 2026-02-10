@@ -1,0 +1,39 @@
+:root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+body { margin:0; background:#0b0f17; color:#e8eefc; }
+.topbar { position:sticky; top:0; background:#0f1626; padding:12px 14px; border-bottom:1px solid #1e2a44; z-index:10; }
+.brand { font-weight:700; }
+.tabs { display:flex; gap:8px; margin-top:10px; }
+.tab { background:#141f36; border:1px solid #1e2a44; color:#e8eefc; padding:8px 10px; border-radius:10px; cursor:pointer; }
+.tab.active { background:#1b2b4c; }
+
+.container { max-width:860px; margin:16px auto; padding:0 12px; }
+.view { display:none; }
+.view.active { display:block; }
+
+.card { background:#0f1626; border:1px solid #1e2a44; border-radius:14px; padding:14px; margin-bottom:14px; }
+.row { display:flex; align-items:center; }
+.between { justify-content:space-between; }
+.gap { gap:10px; flex-wrap:wrap; }
+h2,h3 { margin:0 0 10px 0; }
+.muted { color:#aab7d5; }
+.small { font-size:12px; }
+
+.btn { background:#141f36; border:1px solid #1e2a44; color:#e8eefc; padding:10px 12px; border-radius:12px; cursor:pointer; }
+.btn.primary { background:#2a5bd7; border-color:#2a5bd7; }
+.btn.danger { background:#8b2a2a; border-color:#8b2a2a; }
+
+.field { margin:10px 0; }
+.label { display:block; font-weight:600; margin-bottom:6px; }
+.input, select, textarea { width:100%; padding:10px; border-radius:12px; border:1px solid #1e2a44; background:#0b0f17; color:#e8eefc; }
+textarea { min-height:90px; }
+
+.counter { display:flex; gap:10px; align-items:center; }
+.counter .btn { width:44px; height:44px; display:flex; justify-content:center; align-items:center; padding:0; }
+.counter .val { min-width:48px; text-align:center; font-size:20px; font-weight:700; }
+
+.hidden { display:none; }
+.list { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+.item { border:1px solid #1e2a44; border-radius:12px; padding:10px; }
+.item .meta { font-size:12px; color:#aab7d5; }
+.qrWrap { margin-top:12px; display:flex; flex-direction:column; gap:8px; align-items:flex-start; }
+#qrCanvas { background:#fff; border-radius:8px; padding:8px; }
