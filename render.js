@@ -1,5 +1,3 @@
-// render.js
-
 function setDeep(obj, path, value) {
   const parts = path.split(".");
   let cur = obj;
@@ -41,7 +39,7 @@ function renderFields(container, fields, state) {
 
     const key = f.key;
 
-    // TEXT & NUMBER
+    // TEXT / NUMBER
     if (f.type === "text" || f.type === "number") {
 
       const input = document.createElement("input");
@@ -57,6 +55,7 @@ function renderFields(container, fields, state) {
 
         setDeep(state, key, v);
 
+        // cycle değişince yeniden render
         if (f.repeatShots) {
           renderFields(container, fields, state);
         }
@@ -149,49 +148,6 @@ function renderFields(container, fields, state) {
         });
 
         group.appendChild(b);
-
-      });
-
-      wrap.appendChild(group);
-    }
-
-    // MULTISELECT (YENİ)
-    if (f.type === "multiselect") {
-
-      let selected = getDeep(state, key) || [];
-
-      const group = document.createElement("div");
-      group.className = "row gap";
-
-      f.options.forEach(opt => {
-
-        const btn = document.createElement("button");
-        btn.className = "btn";
-
-        if (selected.includes(opt)) {
-          btn.classList.add("primary");
-        }
-
-        btn.textContent = opt;
-
-        btn.onclick = (e) => {
-
-          e.preventDefault();
-
-          let arr = getDeep(state, key) || [];
-
-          if (arr.includes(opt)) {
-            arr = arr.filter(x => x !== opt);
-          } else {
-            arr.push(opt);
-          }
-
-          setDeep(state, key, arr);
-
-          renderFields(container, fields, state);
-        };
-
-        group.appendChild(btn);
 
       });
 
@@ -333,7 +289,92 @@ function renderFields(container, fields, state) {
 
     container.appendChild(wrap);
 
+    // ===== DYNAMIC CYCLE SHOTS =====
+
+    if (f.repeatShots) {
+
+      const cycles = Number(getDeep(state, key) ?? 0);
+      const baseKey = key.replace(".cycles","");
+
+      for (let i = 0; i < cycles; i++) {
+
+        const cycleWrap = document.createElement("div");
+        cycleWrap.className = "cycle-block";
+
+        const title = document.createElement("div");
+        title.className = "label";
+        title.textContent = "Cycle " + (i+1);
+
+        cycleWrap.appendChild(title);
+
+        const successKey = baseKey + ".shots." + i + ".success";
+        const timeKey = baseKey + ".shots." + i + ".time";
+
+        const slider = document.createElement("input");
+        slider.type = "range";
+        slider.min = 0;
+        slider.max = 100;
+
+        const val = getDeep(state, successKey) ?? 0;
+        slider.value = val;
+
+        const display = document.createElement("span");
+        display.className = "val";
+        display.textContent = val + "%";
+
+        slider.addEventListener("input", () => {
+
+          const v = Number(slider.value);
+
+          setDeep(state, successKey, v);
+
+          display.textContent = v + "%";
+
+        });
+
+        cycleWrap.appendChild(slider);
+        cycleWrap.appendChild(display);
+
+        const timerBtn = document.createElement("button");
+        timerBtn.textContent = "Start Timer";
+
+        let start = 0;
+        let running = false;
+
+        timerBtn.onclick = () => {
+
+          if (!running) {
+
+            running = true;
+
+            start = Date.now();
+
+            timerBtn.textContent = "Stop Timer";
+
+          } else {
+
+            running = false;
+
+            const sec = Math.floor((Date.now() - start)/1000);
+
+            setDeep(state, timeKey, sec);
+
+            timerBtn.textContent = sec + " s";
+
+          }
+
+        };
+
+        cycleWrap.appendChild(timerBtn);
+
+        container.appendChild(cycleWrap);
+
+      }
+
+    }
+
   });
+
 }
 
 function validateRequired(fields, state) {
