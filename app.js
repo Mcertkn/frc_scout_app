@@ -1,190 +1,259 @@
 let CFG;
 let pageIdx = 0;
-let formState = {}; // current match record draft
+let formState = {};
 
-function qs(sel) { return document.querySelector(sel); }
-function qsa(sel) { return Array.from(document.querySelectorAll(sel)); }
+function qs(sel){return document.querySelector(sel);}
+function qsa(sel){return Array.from(document.querySelectorAll(sel));}
 
-async function loadConfig() {
-  const res = await fetch("./config/2026.json");
-  CFG = await res.json();
-  document.title = CFG.app?.name ?? "FRC Scout";
+async function loadConfig(){
+const res=await fetch("./config/2026.json");
+CFG=await res.json();
 }
 
-function currentPage() { return CFG.pages[pageIdx]; }
+function currentPage(){return CFG.pages[pageIdx];}
 
-function updateTabs(tab) {
-  qsa(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
-  qsa(".view").forEach(v => v.classList.remove("active"));
-  qs(`#view-${tab}`).classList.add("active");
+function renderPage(){
+
+const p=currentPage();
+
+qs("#pageTitle").textContent=p.title;
+qs("#pageIndex").textContent=`${pageIdx+1} / ${CFG.pages.length}`;
+
+renderFields(qs("#formArea"),p.fields,formState);
+
+qs("#prevBtn").disabled=pageIdx===0;
+qs("#nextBtn").textContent=pageIdx===CFG.pages.length-1?"Finish":"Next";
+
+qs("#postActions").classList.toggle(
+"hidden",
+pageIdx!==CFG.pages.length-1
+);
+
 }
 
-function renderPage() {
-  const p = currentPage();
-  qs("#pageTitle").textContent = p.title;
-  qs("#pageIndex").textContent = `${pageIdx + 1} / ${CFG.pages.length}`;
+function buildRecord(){
 
-  const area = qs("#formArea");
-  renderFields(area, p.fields, formState);
+const event=CFG.app.eventCode;
 
-  qs("#prevBtn").disabled = pageIdx === 0;
-  qs("#nextBtn").textContent = (pageIdx === CFG.pages.length - 1) ? "Finish" : "Next";
+const record_id=`${event}_${formState.match}_${formState.robotPos}_${formState.team}_${formState.scouter}`;
 
-  // son sayfada Save/QR paneli aç
-  const isLast = pageIdx === CFG.pages.length - 1;
-  qs("#postActions").classList.toggle("hidden", !isLast);
+return{
+record_id,
+event,
+ts:new Date().toISOString(),
+...formState
+};
 
-  if (isLast) {
-    // QR preview (save zorunlu değil; backup için preview gösterebilir)
-    const draft = buildRecord({ draft: true });
-    makeQR(qs("#qrCanvas"), draft).catch(() => {});
-  }
 }
 
-function buildRecord({ draft=false }={}) {
-  const event = CFG.app?.eventCode ?? "EVENT";
-  const scouter = (formState.scouter ?? "").toString().trim();
-  const match = Number(formState.match ?? NaN);
-  const team = Number(formState.team ?? NaN);
-  const robotPos = (formState.robotPos ?? "").toString().trim();
+async function uploadToFirebase(rec){
 
-  const record_id = `${event}_${match}_${robotPos}_${team}_${scouter}`.replaceAll(/\s+/g, "_");
-
-  return {
-    record_id,
-    event,
-    match,
-    team,
-    robotPos,
-    scouter,
-    ts: new Date().toISOString(),
-    draft,
-    data: formState
-  };
+try{
+await db.collection("records").doc(rec.record_id).set(rec);
+}
+catch(e){
+console.log("offline olabilir");
 }
 
-function validateAllRequired() {
-  // Her sayfanın required alanlarını kontrol et
-  const missing = [];
-  CFG.pages.forEach(p => missing.push(...validateRequired(p.fields, formState)));
-  return Array.from(new Set(missing));
 }
 
-function clearForm() {
-  formState = {};
-  pageIdx = 0;
-  renderPage();
+async function saveRecord(){
+
+const rec=buildRecord();
+
+await putRecord(rec);
+
+uploadToFirebase(rec);
+
+makeQR(qs("#qrCanvas"),rec);
+
+alert("Kaydedildi");
+
 }
 
-async function saveRecord() {
-  const missing = validateAllRequired();
-  if (missing.length) {
-    alert("Eksik alanlar:\n- " + missing.join("\n- "));
-    return;
-  }
+async function refreshRecords(){
 
-  const rec = buildRecord({ draft: false });
-  // record_id sağlam mı?
-  if (!rec.record_id || rec.record_id.includes("NaN") || rec.record_id.includes("__")) {
-    alert("record_id üretilemedi. Pre-Match alanlarını kontrol et (match/team/robot/scouter).");
-    return;
-  }
+const list=qs("#recordsList");
 
-  await putRecord(rec);
-  await makeQR(qs("#qrCanvas"), rec);
+list.innerHTML="Yükleniyor...";
 
-  alert("Kaydedildi ✅\nQR screenshot alabilirsiniz.");
+let recs=await getAllRecords();
+
+try{
+
+const snap=await db.collection("records").get();
+
+const cloud=snap.docs.map(d=>d.data());
+
+const map=new Map();
+
+[...recs,...cloud].forEach(r=>{
+map.set(r.record_id,r);
+});
+
+recs=Array.from(map.values());
+
+}
+catch(e){
+console.log("offline olabilir");
 }
 
-async function refreshRecords() {
-  const list = qs("#recordsList");
-  list.innerHTML = "Yükleniyor...";
-  const recs = await getAllRecords();
-  recs.sort((a,b) => (b.ts||"").localeCompare(a.ts||""));
+list.innerHTML="";
 
-  if (!recs.length) {
-    list.innerHTML = "<div class='muted'>Henüz kayıt yok.</div>";
-    return;
-  }
+recs.forEach(r=>{
 
-  list.innerHTML = "";
-  recs.slice(0, 50).forEach(r => {
-    const div = document.createElement("div");
-    div.className = "item";
-    div.innerHTML = `
-      <div><b>${r.event}</b> • Match ${r.match} • ${r.robotPos} • Team ${r.team}</div>
-      <div class="meta">${r.record_id}</div>
-      <div class="row gap" style="margin-top:8px">
-        <button class="btn" data-del="${r.record_id}">Sil</button>
-      </div>
-    `;
-    list.appendChild(div);
-  });
+const div=document.createElement("div");
 
-  list.querySelectorAll("[data-del]").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const id = btn.dataset.del;
-      if (!confirm(`Silinsin mi?\n${id}`)) return;
-      await deleteRecord(id);
-      refreshRecords();
-    });
-  });
+div.innerHTML=`Match ${r.match} - Team ${r.team}`;
+
+list.appendChild(div);
+
+});
+
 }
 
-async function exportJSON() {
-  const recs = await getAllRecords();
-  const content = toJSONL(recs);
-  const name = `scout_${CFG.app?.eventCode ?? "event"}_${new Date().toISOString().slice(0,10)}.jsonl`;
-  downloadFile(name, content, "application/json");
+async function exportJSON(){
+
+let recs = await getAllRecords();
+
+try{
+
+const snap = await db.collection("records").get();
+
+const cloud = snap.docs.map(d=>d.data());
+
+const map = new Map();
+
+[...recs,...cloud].forEach(r=>{
+map.set(r.record_id,r);
+});
+
+recs = Array.from(map.values());
+
+}
+catch(e){
+console.log("firebase offline olabilir");
 }
 
-async function exportCSV() {
-  const recs = await getAllRecords();
-  const content = toCSV(recs.map(r => ({
-    record_id: r.record_id,
-    event: r.event,
-    match: r.match,
-    team: r.team,
-    robotPos: r.robotPos,
-    scouter: r.scouter,
-    ts: r.ts,
-    ...r.data
-  })));
-  const name = `scout_${CFG.app?.eventCode ?? "event"}_${new Date().toISOString().slice(0,10)}.csv`;
-  downloadFile(name, content, "text/csv");
+const text = JSON.stringify(recs,null,2);
+
+downloadFile("scout.json",text,"application/json");
+
 }
 
-function wireUI() {
-  // Tabs
-  qsa(".tab").forEach(b => b.addEventListener("click", () => {
-    updateTabs(b.dataset.tab);
-    if (b.dataset.tab === "records") refreshRecords();
-  }));
+async function exportCSV(){
 
-  qs("#prevBtn").addEventListener("click", () => { if (pageIdx > 0) { pageIdx--; renderPage(); } });
-  qs("#nextBtn").addEventListener("click", () => {
-    if (pageIdx < CFG.pages.length - 1) { pageIdx++; renderPage(); }
-    else alert("Son sayfadasın. Save ile kaydedebilirsin.");
-  });
+let recs = await getAllRecords();
 
-  qs("#saveBtn").addEventListener("click", saveRecord);
-  qs("#clearBtn").addEventListener("click", () => {
-    if (confirm("Form sıfırlansın mı?")) clearForm();
-  });
+try{
 
-  qs("#refreshRecordsBtn").addEventListener("click", refreshRecords);
-  qs("#wipeBtn").addEventListener("click", async () => {
-    if (!confirm("Bu cihazdaki TÜM kayıtlar silinecek. Emin misin?")) return;
-    await wipeAll();
-    refreshRecords();
-  });
+const snap = await db.collection("records").get();
 
-  qs("#exportJsonBtn").addEventListener("click", exportJSON);
-  qs("#exportCsvBtn").addEventListener("click", exportCSV);
+const cloud = snap.docs.map(d=>d.data());
+
+const map = new Map();
+
+[...recs,...cloud].forEach(r=>{
+map.set(r.record_id,r);
+});
+
+recs = Array.from(map.values());
+
+}
+catch(e){
+console.log("firebase offline olabilir");
 }
 
-(async function main() {
-  await loadConfig();
-  wireUI();
-  renderPage();
+const csv = toCSV(recs);
+
+downloadFile("scout.csv",csv,"text/csv");
+
+}
+
+/* 🔴 KRİTİK: Firebase → Local Sync */
+
+async function syncFromFirebase(){
+
+try{
+
+const snap = await db.collection("records").get();
+
+for(const doc of snap.docs){
+
+const rec = doc.data();
+
+await putRecord(rec);
+
+}
+
+console.log("Firebase sync tamam");
+
+}
+catch(e){
+
+console.log("Firebase sync yapılamadı", e);
+
+}
+
+}
+
+function wireUI(){
+
+qsa(".tab").forEach(b=>{
+b.onclick=()=>{
+qsa(".view").forEach(v=>v.classList.remove("active"));
+qs(`#view-${b.dataset.tab}`).classList.add("active");
+if(b.dataset.tab==="records")refreshRecords();
+};
+});
+
+qs("#prevBtn").onclick=()=>{
+if(pageIdx>0){
+pageIdx--;
+renderPage();
+}
+};
+
+qs("#nextBtn").onclick=()=>{
+if(pageIdx<CFG.pages.length-1){
+pageIdx++;
+renderPage();
+}
+};
+
+qs("#saveBtn").onclick=saveRecord;
+
+qs("#clearBtn").onclick=()=>{
+formState={};
+pageIdx=0;
+renderPage();
+};
+
+qs("#refreshRecordsBtn").onclick=refreshRecords;
+
+qs("#wipeBtn").onclick=async()=>{
+await wipeAll();
+refreshRecords();
+};
+
+qs("#exportJsonBtn").onclick=exportJSON;
+qs("#exportCsvBtn").onclick=exportCSV;
+
+}
+
+function makeQR(canvas,data){
+QRCode.toCanvas(canvas,JSON.stringify(data),{width:200});
+}
+
+(async function main(){
+
+await loadConfig();
+
+/* 🔴 Firebase kayıtlarını indir */
+await syncFromFirebase();
+
+wireUI();
+
+renderPage();
+
 })();

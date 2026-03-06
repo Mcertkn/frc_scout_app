@@ -1,6 +1,8 @@
 {
   "app": { "name": "FRC Scout 2026", "eventCode": "IST2026" },
+
   "pages": [
+
     {
       "id": "prematch",
       "title": "Pre-Match",
@@ -11,37 +13,209 @@
         { "key": "team", "label": "Team #", "type": "number", "required": true }
       ]
     },
+
     {
       "id": "auto",
       "title": "Autonomous",
       "fields": [
-        { "key": "auto.speaker", "label": "Auto Speaker", "type": "counter", "min": 0 },
-        { "key": "auto.amp", "label": "Auto Amp", "type": "counter", "min": 0 }
+        { "key": "auto.preloaded", "label": "Preloaded?", "type": "radio", "options": ["yes","no"] },
+        { "key": "auto.mobility", "label": "Mobility?", "type": "radio", "options": ["yes","no"] },
+        { "key": "auto.preloadShoot", "label": "Preload Shoot?", "type": "radio", "options": ["yes","no"] },
+
+        { "key": "auto.fuelIska", "label": "Fuel Iska", "type": "counter", "min": 0 },
+
+        {
+          "key": "auto.cycles",
+          "label": "Cycle Sayısı",
+          "type": "number",
+          "repeatShots": "auto"
+        },
+
+        { 
+          "key": "auto.source",
+          "label": "Source",
+          "type": "multiselect",
+          "options": ["outpost","depot","neutralzone"]
+        },
+
+        { "key": "auto.neutralZone", "label": "Neutral Zone?", "type": "radio", "options": ["yes","no"] },
+
+        { "key": "auto.hopperFuel", "label": "Hopperda Kalan Fuel", "type": "number" },
+
+        { "key": "auto.climb", "label": "Climb?", "type": "radio", "options": ["yes","no"] },
+        { "key": "auto.climbSn", "label": "Climb Sn", "type": "number" },
+
+        { "key": "auto.notes", "label": "Notes", "type": "textarea" }
       ]
     },
+
     {
-      "id": "teleop",
-      "title": "Teleop",
+      "id": "transition",
+      "title": "Transition",
       "fields": [
-        { "key": "teleop.speaker", "label": "Teleop Speaker", "type": "counter", "min": 0 },
-        { "key": "teleop.amp", "label": "Teleop Amp", "type": "counter", "min": 0 }
+
+        {
+          "key": "transition.cycles",
+          "label": "Cycle Sayısı",
+          "type": "number",
+          "repeatShots": "transition"
+        },
+
+        { 
+          "key": "transition.role",
+          "label": "Defans / Oyun",
+          "type": "multiselect",
+          "options": ["defans","oyun"]
+        },
+
+        { "key": "transition.fuelIska", "label": "Fuel Iska", "type": "number" },
+
+        { "key": "transition.notes", "label": "Notes", "type": "textarea" }
       ]
     },
+
+    {
+      "id": "shift",
+      "title": "Shift",
+      "fields": [
+
+        {
+          "key": "shift.active1.cycles",
+          "label": "ACTIVE 1 - Cycle Sayısı",
+          "type": "number",
+          "repeatShots": "active1"
+        },
+
+        { 
+          "key": "shift.active1.role",
+          "label": "ACTIVE 1 - Oyun / Feed / Defans",
+          "type": "multiselect",
+          "options": ["oyun","feed","defans"]
+        },
+
+        {
+          "key": "shift.active1.feedType",
+          "label": "Feedse Shoot mu Trench mi?",
+          "type": "radio",
+          "options": ["shoot","trench"],
+          "showIf": { "key": "shift.active1.role", "equals": "feed" }
+        },
+
+        { 
+          "key": "shift.active1.source",
+          "label": "ACTIVE 1 - Source",
+          "type": "multiselect",
+          "options": ["depot","outpost","neutralzone","alliancezone"]
+        },
+
+        { "key": "shift.active1.fuelIska", "label": "ACTIVE 1 - Fuel Iska", "type": "number" },
+
+        { "key": "shift.active1.humanShoot", "label": "ACTIVE 1 - Human Shoot (adet)", "type": "number" },
+
+        { "key": "shift.active1.notes", "label": "ACTIVE 1 - Notes", "type": "textarea" },
+
+        { 
+          "key": "shift.inactive1.role",
+          "label": "INACTIVE 1 - Defans / Feed",
+          "type": "multiselect",
+          "options": ["defans","feed"]
+        },
+
+        { "key": "shift.inactive1.cycles", "label": "INACTIVE 1 - Cycle Sayısı", "type": "number" },
+
+        { "key": "shift.inactive1.foul", "label": "INACTIVE 1 - Faul Yaptı mı?", "type": "radio", "options": ["yes","no"] },
+
+        { "key": "shift.inactive1.notes", "label": "INACTIVE 1 - Notes", "type": "textarea" },
+
+        {
+          "key": "shift.active2.cycles",
+          "label": "ACTIVE 2 - Cycle Sayısı",
+          "type": "number",
+          "repeatShots": "active2"
+        },
+
+        { 
+          "key": "shift.active2.role",
+          "label": "ACTIVE 2 - Oyun / Feed / Defans",
+          "type": "multiselect",
+          "options": ["oyun","feed","defans"]
+        },
+
+        {
+          "key": "shift.active2.feedType",
+          "label": "Feedse Shoot mu Trench mi?",
+          "type": "radio",
+          "options": ["shoot","trench"],
+          "showIf": { "key": "shift.active2.role", "equals": "feed" }
+        },
+
+        { 
+          "key": "shift.active2.source",
+          "label": "ACTIVE 2 - Source",
+          "type": "multiselect",
+          "options": ["depot","outpost","neutralzone","alliancezone"]
+        },
+
+        { "key": "shift.active2.fuelIska", "label": "ACTIVE 2 - Fuel Iska", "type": "number" },
+
+        { "key": "shift.active2.humanShoot", "label": "ACTIVE 2 - Human Shoot (adet)", "type": "number" },
+
+        { "key": "shift.active2.notes", "label": "ACTIVE 2 - Notes", "type": "textarea" },
+
+        { 
+          "key": "shift.inactive2.role",
+          "label": "INACTIVE 2 - Defans / Feed",
+          "type": "multiselect",
+          "options": ["defans","feed"]
+        },
+
+        { "key": "shift.inactive2.cycles", "label": "INACTIVE 2 - Cycle Sayısı", "type": "number" },
+
+        { "key": "shift.inactive2.foul", "label": "INACTIVE 2 - Faul Yaptı mı?", "type": "radio", "options": ["yes","no"] },
+
+        { "key": "shift.inactive2.notes", "label": "INACTIVE 2 - Notes", "type": "textarea" }
+      ]
+    },
+
     {
       "id": "endgame",
-      "title": "Endgame",
+      "title": "End Game",
       "fields": [
-        { "key": "endgame.level", "label": "Endgame Level", "type": "radio", "options": ["None","Park","Level1","Level2","Level3"] },
-        { "key": "fouls", "label": "Fouls", "type": "counter", "min": 0 }
+        { "key": "endgame.climb", "label": "Climb?", "type": "radio", "options": ["yes","no"] },
+        { "key": "endgame.level", "label": "Level", "type": "radio", "options": ["l1","l2","l3"] },
+        { "key": "endgame.time", "label": "Kaç saniyede?", "type": "number" },
+        { "key": "endgame.notes", "label": "Notes", "type": "textarea" }
       ]
     },
+
     {
-      "id": "post",
-      "title": "Post-Match",
+      "id": "general",
+      "title": "General",
       "fields": [
-        { "key": "breakdown", "label": "Breakdown oldu mu?", "type": "checkbox" },
-        { "key": "notes", "label": "Notes", "type": "textarea" }
+        { "key": "general.trenchOrBump", "label": "Trench or Bump", "type": "radio", "options": ["trench","bump"] },
+
+        { "key": "general.climbOnBall", "label": "Top üstüne çıkıyor mu?", "type": "radio", "options": ["yes","no"] },
+
+        { 
+          "key": "general.source",
+          "label": "Hangi source?",
+          "type": "multiselect",
+          "options": ["counterAlliance","outpost","depot","neutralzone","alliancezone"]
+        },
+
+        { "key": "general.groundIntake", "label": "Ground intake?", "type": "radio", "options": ["yes","no"] },
+
+        { "key": "general.shootWhileIntake", "label": "Top alırken atış yapabiliyor mu?", "type": "radio", "options": ["yes","no"] },
+
+        { "key": "general.bps", "label": "BPS", "type": "number" },
+
+        { "key": "general.hopperCapacity", "label": "Hopper Kapasite", "type": "number" },
+
+        { "key": "general.fuelLeft", "label": "İçinde Kalan Fuel", "type": "number" },
+
+        { "key": "general.notes", "label": "Notes", "type": "textarea" }
       ]
     }
+
   ]
 }

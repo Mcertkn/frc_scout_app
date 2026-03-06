@@ -1,100 +1,145 @@
 <!doctype html>
 <html lang="tr">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FRC Scout</title>
 
-  <link rel="manifest" href="./manifest.json">
-  <link rel="stylesheet" href="./styles.css" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 
-  <!-- Offline garanti istiyorsan bunları libs/ klasöründen yükle -->
-  <script defer src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+<title>FRC Scout</title>
 
+<link rel="manifest" href="./manifest.json">
+<link rel="stylesheet" href="./styles.css"/>
 
-  <script defer src="./db.js"></script>
-  <script defer src="./render.js"></script>
-  <script defer src="libs/qrcode.min.js""></script>
-  <script defer src="./export.js"></script>
-  <script defer src="./app.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<!-- IndexedDB helper -->
+<script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
+
+<!-- QR code -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<!-- Excel export -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<!-- App scripts -->
+<script defer src="./firebase.js"></script>
+<script defer src="./db.js"></script>
+<script defer src="./render.js"></script>
+<script defer src="./export.js"></script>
+<script defer src="./app.js"></script>
+
 </head>
+
 <body>
-  <header class="topbar">
-    <div class="brand">FRC Scout</div>
-    <nav class="tabs">
-      <button class="tab active" data-tab="scout">Scout</button>
-      <button class="tab" data-tab="records">Kayıtlar</button>
-      <button class="tab" data-tab="export">Export</button>
-    </nav>
-  </header>
 
-  <main class="container">
-    <section id="view-scout" class="view active">
-      <div class="card">
-        <div class="row between">
-          <h2 id="pageTitle">Yükleniyor...</h2>
-          <div class="muted" id="pageIndex">-</div>
-        </div>
+<header class="topbar">
 
-        <div id="formArea"></div>
+<div class="brand">FRC Scout</div>
 
-        <div class="row between gap">
-          <button id="prevBtn" class="btn">Prev</button>
-          <button id="nextBtn" class="btn primary">Next</button>
-        </div>
-      </div>
+<nav class="tabs">
+<button class="tab active" data-tab="scout">Scout</button>
+<button class="tab" data-tab="records">Kayıtlar</button>
+<button class="tab" data-tab="export">Export</button>
+</nav>
 
-      <div id="postActions" class="card hidden">
-        <h3>Kaydet & QR</h3>
-        <div class="muted">Kaydetmeden önce son sayfadasın. Save basınca kayıt cihazda saklanır.</div>
+</header>
 
-        <div class="row gap">
-          <button id="saveBtn" class="btn primary">Save</button>
-          <button id="clearBtn" class="btn">Clear Form</button>
-        </div>
+<main class="container">
 
-        <div class="qrWrap">
-          <canvas id="qrCanvas"></canvas>
-          <div class="muted small">QR = bu maçın JSON kaydı. Screenshot alın.</div>
-        </div>
-      </div>
-    </section>
+<section id="view-scout" class="view active">
 
-    <section id="view-records" class="view">
-      <div class="card">
-        <h2>Kayıtlar (Bu cihaz)</h2>
-        <div class="row gap">
-          <button id="refreshRecordsBtn" class="btn">Yenile</button>
-          <button id="wipeBtn" class="btn danger">Tümünü Sil</button>
-        </div>
-        <div id="recordsList" class="list"></div>
-      </div>
-    </section>
+<div class="card">
 
-    <section id="view-export" class="view">
-      <div class="card">
-        <h2>Export</h2>
-        <p class="muted">
-          Gün sonunda buradan dosyayı indirin (Offline çalışır umarım)
-        </p>
-        <div class="row gap">
-          <button id="exportJsonBtn" class="btn primary">Export JSON</button>
-          <button id="exportCsvBtn" class="btn">Export CSV</button>
-        </div>
-        <div class="muted small">
-          Not: JSON daha güvenilir. CSV Excel için pratik.
-        </div>
-      </div>
-    </section>
-  </main>
+<div class="row between">
+<h2 id="pageTitle">Yükleniyor...</h2>
+<div class="muted" id="pageIndex">-</div>
+</div>
 
-  <script>
-    // PWA offline
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
-    }
-  </script>
+<div id="formArea"></div>
+
+<div class="row between gap">
+<button id="prevBtn" class="btn">Prev</button>
+<button id="nextBtn" class="btn primary">Next</button>
+</div>
+
+</div>
+
+<div id="postActions" class="card hidden">
+
+<h3>Kaydet & QR</h3>
+
+<div class="row gap">
+<button id="saveBtn" class="btn primary">Save</button>
+<button id="clearBtn" class="btn">Clear Form</button>
+</div>
+
+<div class="qrWrap">
+<canvas id="qrCanvas"></canvas>
+<div class="muted small">
+QR = bu maçın JSON kaydı. Screenshot alın.
+</div>
+</div>
+
+</div>
+
+</section>
+
+
+<section id="view-records" class="view">
+
+<div class="card">
+
+<h2>Kayıtlar</h2>
+
+<div class="row gap">
+<button id="refreshRecordsBtn" class="btn">Yenile</button>
+<button id="wipeBtn" class="btn danger">Tümünü Sil</button>
+</div>
+
+<div id="recordsList" class="list"></div>
+
+</div>
+
+</section>
+
+
+<section id="view-export" class="view">
+
+<div class="card">
+
+<h2>Export</h2>
+
+<p class="muted">
+Gün sonunda buradan verileri indirebilirsiniz
+</p>
+
+<div class="row gap">
+<button id="exportJsonBtn" class="btn primary">Export JSON</button>
+<button id="exportCsvBtn" class="btn">Export CSV</button>
+<button id="exportExcelBtn" class="btn primary">Export Excel</button>
+</div>
+
+<div class="muted small">
+JSON = en güvenilir format<br>
+CSV = Excel için pratik<br>
+Excel = direkt analiz için
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js");
+}
+</script>
+
 </body>
 </html>
-
