@@ -231,9 +231,32 @@ renderPage();
 
 qs("#refreshRecordsBtn").onclick=refreshRecords;
 
+/* 🔴 DÜZELTİLMİŞ TÜMÜNÜ SİL */
+
 qs("#wipeBtn").onclick=async()=>{
+
+if(!confirm("Tüm kayıtlar silinsin mi?")) return;
+
 await wipeAll();
+
+try{
+
+const snap = await db.collection("records").get();
+
+const batch = db.batch();
+
+snap.docs.forEach(doc=>{
+batch.delete(doc.ref);
+});
+
+await batch.commit();
+
+}catch(e){
+console.log("firebase silinemedi",e);
+}
+
 refreshRecords();
+
 };
 
 qs("#exportJsonBtn").onclick=exportJSON;
