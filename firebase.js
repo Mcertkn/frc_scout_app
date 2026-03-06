@@ -1,5 +1,5 @@
 const firebaseConfig = {
-  apiKey: "AIzaSyC5S11THBK-XMvhRoFLyYo2DywghUbPjVs",
+  apiKey: "AIzaSyDy4x09ZbyMGg_EQ305bTcx7SYKpIsVHEo",
   authDomain: "frc-scout-2026.firebaseapp.com",
   projectId: "frc-scout-2026",
   storageBucket: "frc-scout-2026.firebasestorage.app",
