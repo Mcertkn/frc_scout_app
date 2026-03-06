@@ -34,7 +34,7 @@
         { 
           "key": "auto.source",
           "label": "Source",
-          "type": "multiselect",
+          "type": "checkbox",
           "options": ["outpost","depot","neutralzone"]
         },
 
@@ -64,7 +64,7 @@
         { 
           "key": "transition.role",
           "label": "Defans / Oyun",
-          "type": "multiselect",
+          "type": "checkbox",
           "options": ["defans","oyun"]
         },
 
@@ -89,7 +89,7 @@
         { 
           "key": "shift.active1.role",
           "label": "ACTIVE 1 - Oyun / Feed / Defans",
-          "type": "multiselect",
+          "type": "checkbox",
           "options": ["oyun","feed","defans"]
         },
 
@@ -97,14 +97,13 @@
           "key": "shift.active1.feedType",
           "label": "Feedse Shoot mu Trench mi?",
           "type": "radio",
-          "options": ["shoot","trench"],
-          "showIf": { "key": "shift.active1.role", "equals": "feed" }
+          "options": ["shoot","trench"]
         },
 
         { 
           "key": "shift.active1.source",
           "label": "ACTIVE 1 - Source",
-          "type": "multiselect",
+          "type": "checkbox",
           "options": ["depot","outpost","neutralzone","alliancezone"]
         },
 
@@ -117,7 +116,7 @@
         { 
           "key": "shift.inactive1.role",
           "label": "INACTIVE 1 - Defans / Feed",
-          "type": "multiselect",
+          "type": "checkbox",
           "options": ["defans","feed"]
         },
 
@@ -137,7 +136,7 @@
         { 
           "key": "shift.active2.role",
           "label": "ACTIVE 2 - Oyun / Feed / Defans",
-          "type": "multiselect",
+          "type": "checkbox",
           "options": ["oyun","feed","defans"]
         },
 
@@ -145,14 +144,13 @@
           "key": "shift.active2.feedType",
           "label": "Feedse Shoot mu Trench mi?",
           "type": "radio",
-          "options": ["shoot","trench"],
-          "showIf": { "key": "shift.active2.role", "equals": "feed" }
+          "options": ["shoot","trench"]
         },
 
         { 
           "key": "shift.active2.source",
           "label": "ACTIVE 2 - Source",
-          "type": "multiselect",
+          "type": "checkbox",
           "options": ["depot","outpost","neutralzone","alliancezone"]
         },
 
@@ -165,7 +163,7 @@
         { 
           "key": "shift.inactive2.role",
           "label": "INACTIVE 2 - Defans / Feed",
-          "type": "multiselect",
+          "type": "checkbox",
           "options": ["defans","feed"]
         },
 
@@ -199,7 +197,7 @@
         { 
           "key": "general.source",
           "label": "Hangi source?",
-          "type": "multiselect",
+          "type": "checkbox",
           "options": ["counterAlliance","outpost","depot","neutralzone","alliancezone"]
         },
 

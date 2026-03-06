@@ -106,19 +106,68 @@ function renderFields(container, fields, state) {
       wrap.appendChild(display);
     }
 
-    // CHECKBOX
-    if (f.type === "checkbox") {
+    
+    // CHECKBOX (multi select destekli)
 
-      const input = document.createElement("input");
-      input.type = "checkbox";
-      input.checked = Boolean(getDeep(state, key));
+if (f.type === "checkbox") {
 
-      input.addEventListener("change", () => {
-        setDeep(state, key, input.checked);
-      });
+  // seçenekli checkbox (multi select)
 
-      wrap.appendChild(input);
-    }
+  if (f.options) {
+
+    const cur = getDeep(state, key) ?? [];
+
+    const group = document.createElement("div");
+    group.className = "row gap";
+
+    f.options.forEach(opt => {
+
+      const b = document.createElement("button");
+      b.className = "btn";
+
+      if (cur.includes(opt)) b.classList.add("primary");
+
+      b.textContent = opt;
+
+      b.onclick = (e) => {
+
+        e.preventDefault();
+
+        let arr = getDeep(state, key) ?? [];
+
+        if (arr.includes(opt)) {
+          arr = arr.filter(x => x !== opt);
+        } else {
+          arr = [...arr, opt];
+        }
+
+        setDeep(state, key, arr);
+
+        renderFields(container, fields, state);
+      };
+
+      group.appendChild(b);
+
+    });
+
+    wrap.appendChild(group);
+
+  } else {
+
+    // tek checkbox
+
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = Boolean(getDeep(state, key));
+
+    input.addEventListener("change", () => {
+      setDeep(state, key, input.checked);
+    });
+
+    wrap.appendChild(input);
+
+  }
+}
 
     // RADIO
     if (f.type === "radio") {
