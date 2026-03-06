@@ -107,12 +107,11 @@ function renderFields(container, fields, state) {
     }
 
     
-    // CHECKBOX (multi select destekli)
+    // CHECKBOX (multi option destekli)
 
 if (f.type === "checkbox") {
 
-  // seçenekli checkbox (multi select)
-
+  // options varsa çoklu seçim
   if (f.options) {
 
     const cur = getDeep(state, key) ?? [];
@@ -122,31 +121,33 @@ if (f.type === "checkbox") {
 
     f.options.forEach(opt => {
 
-      const b = document.createElement("button");
-      b.className = "btn";
+      const labelWrap = document.createElement("label");
+      labelWrap.className = "row gap";
 
-      if (cur.includes(opt)) b.classList.add("primary");
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = cur.includes(opt);
 
-      b.textContent = opt;
-
-      b.onclick = (e) => {
-
-        e.preventDefault();
+      input.addEventListener("change", () => {
 
         let arr = getDeep(state, key) ?? [];
 
-        if (arr.includes(opt)) {
-          arr = arr.filter(x => x !== opt);
-        } else {
+        if (input.checked) {
           arr = [...arr, opt];
+        } else {
+          arr = arr.filter(x => x !== opt);
         }
 
         setDeep(state, key, arr);
+      });
 
-        renderFields(container, fields, state);
-      };
+      const txt = document.createElement("span");
+      txt.textContent = opt;
 
-      group.appendChild(b);
+      labelWrap.appendChild(input);
+      labelWrap.appendChild(txt);
+
+      group.appendChild(labelWrap);
 
     });
 
@@ -154,8 +155,7 @@ if (f.type === "checkbox") {
 
   } else {
 
-    // tek checkbox
-
+    // normal tek checkbox
     const input = document.createElement("input");
     input.type = "checkbox";
     input.checked = Boolean(getDeep(state, key));
